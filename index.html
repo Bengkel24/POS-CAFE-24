@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2A1B12" />
+  <meta name="description" content="Kopi Senja — kasir kedai kopi. Pilih menu, atur pesanan, bayar, dan cetak struk." />
+  <title>Kopi Senja — Kasir & Pemesanan</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>" />
+</head>
+<body class="pos-body is-locked">
+  <a class="skip-link" href="#menu">Lewati ke menu</a>
+
+  <!-- ============================ LOGIN ============================ -->
+  <div class="login-screen is-open" id="loginScreen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="login-card">
+      <div class="login-brand">
+        <span class="brand-mark" aria-hidden="true"><span id="loginLogo">☕</span></span>
+        <span class="brand-text">
+          <strong><span id="loginCafeName">Kopi Senja</span></strong>
+          <small><span id="loginTagline">coffee &amp; kitchen</span></small>
+        </span>
+      </div>
+
+      <div class="login-head">
+        <p class="drawer-kicker">Akses terbatas</p>
+        <h1 id="loginTitle">Masuk ke Kasir</h1>
+        <p>Masukkan username dan password akunmu untuk melanjutkan.</p>
+      </div>
+
+      <form id="loginForm" autocomplete="off">
+        <label class="field">
+          <span>Username</span>
+          <input type="text" id="loginUsername" placeholder="Masukkan username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <div class="password-wrap">
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
+            <button type="button" id="togglePassword" aria-label="Tampilkan password">👁</button>
+          </div>
+        </label>
+        <p class="login-error" id="loginError" hidden></p>
+        <button class="btn btn-primary btn-block" type="submit" id="loginBtn">Masuk</button>
+      </form>
+
+      <p class="login-foot">🔒 Admin &amp; Kasir · data tersimpan di perangkat ini</p>
+    </div>
+  </div>
+
+  <!-- ============================ TOP BAR ============================ -->
+  <header class="pos-top" id="siteHeader">
+    <div class="pos-brand">
+      <span class="brand-mark" aria-hidden="true"><span id="brandLogo">☕</span></span>
+      <span class="brand-text">
+        <strong><span id="cafeNameDisplay" class="cafe-name-var">Kopi Senja</span></strong>
+        <small><span id="taglineDisplay" class="tagline-var">coffee &amp; kitchen</span></small>
+      </span>
+    </div>
+
+    <div class="pos-top-right">
+      <span class="pos-clock" id="clock" aria-hidden="true">--:--</span>
+      <div class="pos-user" id="posUser" title="Akun aktif">
+        <span class="user-avatar" id="userAvatar" aria-hidden="true">A</span>
+        <span class="user-meta">
+          <strong id="userName">Admin</strong>
+          <small id="userRole">Administrator</small>
+        </span>
+      </div>
+      <button class="pos-top-btn" id="openCartBtn" type="button" aria-label="Buka keranjang">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true">
+          <path d="M4 5h2l2.2 10.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.55L21 8H7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="10" cy="20" r="1.4" fill="currentColor"/>
+          <circle cx="18" cy="20" r="1.4" fill="currentColor"/>
+        </svg>
+        <span class="cart-badge" id="cartBadge" aria-hidden="true">0</span>
+      </button>
+      <button class="pos-top-btn" id="btnFullscreen" type="button" title="Layar penuh" aria-label="Layar penuh">⛶</button>
+      <button class="pos-top-btn pos-logout" id="logoutBtn" type="button" title="Keluar" aria-label="Keluar dari akun">⏻</button>
+    </div>
+  </header>
+
+  <!-- ============================ MAIN ============================ -->
+  <main class="pos-main" id="atas">
+    <!-- ---------- KATALOG MENU ---------- -->
+    <section class="pos-catalog" id="menu">
+      <div class="catalog-head">
+        <div>
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Menu kedai</p>
+          <h1>Pilih menu,<br /><em>racik pesanan.</em></h1>
+        </div>
+        <p class="catalog-note">
+          Harga belum termasuk PB1 10% — dihitung otomatis di keranjang.
+        </p>
+      </div>
+
+      <div class="menu-toolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input type="search" id="searchInput" placeholder="Cari kopi, makanan, camilan…" aria-label="Cari menu" autocomplete="off" />
+          <button class="search-clear" id="searchClear" type="button" aria-label="Hapus pencarian" hidden>✕</button>
+        </div>
+
+        <div class="toolbar-right">
+          <label class="sort-wrap">
+            <span class="sr-only">Urutkan menu</span>
+            <select id="sortSelect">
+              <option value="populer">Rekomendasi</option>
+              <option value="murah">Harga terendah</option>
+              <option value="mahal">Harga tertinggi</option>
+              <option value="nama">Nama A–Z</option>
+            </select>
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+              <path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </label>
+        </div>
+      </div>
+
+      <div class="chips" id="categoryChips" role="tablist" aria-label="Kategori menu"></div>
+
+      <div class="menu-meta">
+        <p id="resultCount" class="result-count" aria-live="polite"></p>
+      </div>
+
+      <div class="menu-grid" id="menuGrid"></div>
+
+      <div class="empty-state" id="menuEmpty" hidden>
+        <span class="empty-emoji" aria-hidden="true">🔍</span>
+        <h3>Menu tidak ditemukan</h3>
+        <p>Coba kata kunci lain atau pilih kategori "Semua Menu".</p>
+        <button class="btn btn-ghost" id="resetFilterBtn" type="button">Reset pencarian</button>
+      </div>
+    </section>
+
+    <!-- ---------- KOLOM KANAN: KERANJANG + DASHBOARD ---------- -->
+    <aside class="pos-side" id="adminPanel" aria-label="Panel kasir dan pengelolaan">
+      <div class="side-tabs" role="tablist" aria-label="Panel kasir">
+        <button class="admin-tab is-active" data-admin="cart" type="button" role="tab">🧾 Keranjang <span class="tab-count" id="cartTabCount">0</span></button>
+        <button class="admin-tab" data-admin="dashboard" type="button" role="tab">📊 Dashboard</button>
+        <button class="admin-tab" data-admin="menu" type="button" role="tab">🍽️ Menu</button>
+        <button class="admin-tab" data-admin="stock" type="button" role="tab">📦 Stok</button>
+        <button class="admin-tab" data-admin="report" type="button" role="tab">💰 Laporan</button>
+        <button class="admin-tab" data-admin="cafe" type="button" role="tab">⚙️ Kafe</button>
+      </div>
+
+      <div class="side-head">
+        <div>
+          <p class="drawer-kicker">Mode Kasir</p>
+          <h2 id="adminPanelTitle">Keranjang</h2>
+        </div>
+        <span class="side-live"><span class="dot-live" aria-hidden="true"></span>Buka</span>
+      </div>
+
+      <div class="side-body">
+        <!-- ===== KERANJANG ===== -->
+        <section class="admin-section" data-section="cart">
+          <div class="pos-cart" id="cartDrawer" aria-label="Keranjang pesanan">
+            <p class="cart-kicker">Pesanan baru <span id="cartCountLabel" class="count-pill">0 item</span></p>
+
+            <div class="order-type" role="group" aria-label="Jenis pesanan">
+              <button type="button" class="type-btn is-active" data-type="dinein">
+                <span aria-hidden="true">🍽️</span> Makan di Tempat
+              </button>
+              <button type="button" class="type-btn" data-type="takeaway">
+                <span aria-hidden="true">🥡</span> Dibawa Pulang
+              </button>
+            </div>
+
+            <div class="field-grid" id="detailsGrid">
+              <label class="field">
+                <span>Nama pemesan</span>
+                <input type="text" id="customerName" placeholder="Nama kamu" maxlength="40" autocomplete="name" />
+              </label>
+              <label class="field" id="tableField">
+                <span>Nomor meja</span>
+                <input type="text" id="tableNumber" placeholder="cth. 07" maxlength="4" inputmode="numeric" />
+              </label>
+            </div>
+
+            <div class="cart-items" id="cartItems"></div>
+
+            <div class="cart-empty" id="cartEmpty">
+              <span aria-hidden="true">🧺</span>
+              <p>Keranjangmu masih kosong.</p>
+              <a href="#menu" class="link-arrow" id="emptyCartBrowse">Pilih menu dulu →</a>
+            </div>
+
+            <div class="promo-row" id="promoRow">
+              <label class="field field-promo">
+                <span>Kode promo</span>
+                <div class="promo-input">
+                  <input type="text" id="promoInput" placeholder="Coba SENJA10" autocomplete="off" />
+                  <button type="button" id="applyPromoBtn">Pakai</button>
+                </div>
+              </label>
+              <p class="promo-hint" id="promoHint">SENJA10 · diskon 10% untuk semua pesanan.</p>
+            </div>
+
+            <footer class="cart-foot">
+              <dl class="summary">
+                <div><dt>Subtotal</dt><dd id="sumSubtotal">Rp 0</dd></div>
+                <div id="discountRow" hidden><dt>Diskon <span id="promoBadge" class="promo-badge"></span></dt><dd id="sumDiscount">– Rp 0</dd></div>
+                <div><dt>Pajak PB1 (10%)</dt><dd id="sumTax">Rp 0</dd></div>
+                <div class="summary-total"><dt>Total</dt><dd id="sumTotal">Rp 0</dd></div>
+              </dl>
+              <button class="btn btn-primary btn-block" id="checkoutBtn" type="button" disabled>
+                Lanjut ke Pembayaran
+                <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true">
+                  <path d="M4 10h11M11 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <p class="secure-note">🔒 Pembayaran diproses di perangkat ini · tanpa biaya tambahan</p>
+            </footer>
+          </div>
+        </section>
+
+        <!-- ===== DASHBOARD ===== -->
+        <section class="admin-section" data-section="dashboard" hidden>
+          <div class="stat-grid" id="dashboardStats"></div>
+          <h3 class="admin-h3">Stok Menipis</h3>
+          <div class="low-stock-list" id="dashboardLowStock"></div>
+          <h3 class="admin-h3">Transaksi Terakhir</h3>
+          <div class="recent-list" id="dashboardRecent"></div>
+        </section>
+
+        <!-- ===== MENU ===== -->
+        <section class="admin-section" data-section="menu" hidden>
+          <div class="menu-add-form">
+            <h3>Tambah/Edit Menu</h3>
+            <input type="hidden" id="menuId" />
+            <input type="text" id="menuName" placeholder="Nama Menu" />
+            <textarea id="menuDesc" placeholder="Deskripsi"></textarea>
+            <input type="number" id="menuPrice" placeholder="Harga (Rp)" />
+            <select id="menuCat">
+              <option value="Kopi">Kopi</option>
+              <option value="Non-Kopi">Non-Kopi</option>
+              <option value="Makanan">Makanan</option>
+              <option value="Camilan">Camilan &amp; Manis</option>
+            </select>
+            <input type="text" id="menuEmoji" placeholder="Emoji (☕)" />
+            <input type="number" id="menuStock" placeholder="Stok (mis. 20)" min="0" />
+            <input type="url" id="menuImage" placeholder="URL Gambar (https://...)" />
+            <input type="text" id="menuTag" placeholder="Tag (opsional)" />
+            <label><input type="checkbox" id="menuPopular" /> Populer</label>
+            <label><input type="checkbox" id="menuNew" /> Baru</label>
+            <div class="menu-form-actions">
+              <button id="saveMenuBtn" type="button">Simpan Menu</button>
+              <button id="clearMenuBtn" type="button">Bersihkan</button>
+            </div>
+          </div>
+          <div class="menu-list-admin">
+            <h3>Daftar Menu</h3>
+            <div id="menuListAdmin"></div>
+          </div>
+        </section>
+
+        <!-- ===== STOK ===== -->
+        <section class="admin-section" data-section="stock" hidden>
+          <p class="admin-hint">Atur jumlah stok tiap menu. Stok <strong>0</strong> berarti menu tidak bisa dipesan.</p>
+          <div class="stock-toolbar">
+            <button class="btn btn-ghost" id="stockRestockAllBtn" type="button">Isi Ulang Semua (+10)</button>
+          </div>
+          <div class="stock-list" id="stockList"></div>
+        </section>
+
+        <!-- ===== LAPORAN ===== -->
+        <section class="admin-section" data-section="report" hidden>
+          <div class="report-toolbar">
+            <label class="field">
+              <span>Periode</span>
+              <select id="reportPeriod">
+                <option value="today">Hari ini</option>
+                <option value="7">7 hari terakhir</option>
+                <option value="30">30 hari terakhir</option>
+                <option value="all">Semua</option>
+              </select>
+            </label>
+            <button class="btn btn-ghost" id="exportReportBtn" type="button">Ekspor CSV</button>
+          </div>
+          <div class="stat-grid" id="reportStats"></div>
+          <h3 class="admin-h3">Pendapatan per Hari</h3>
+          <div class="report-bars" id="reportDaily"></div>
+          <h3 class="admin-h3">Metode Pembayaran</h3>
+          <div class="report-pay" id="reportPayments"></div>
+          <h3 class="admin-h3">Menu Terlaris</h3>
+          <div class="report-top" id="reportTopItems"></div>
+        </section>
+
+        <!-- ===== KAFE ===== -->
+        <section class="admin-section" data-section="cafe" hidden>
+          <div class="field">
+            <span>Nama Kafe</span>
+            <input type="text" id="cafeName" placeholder="Contoh: Kopi Senja" />
+          </div>
+          <div class="field">
+            <span>Logo (emoji atau teks)</span>
+            <input type="text" id="cafeLogo" placeholder="☕" maxlength="3" />
+          </div>
+          <div class="field">
+            <span>Tagline</span>
+            <input type="text" id="tagline" placeholder="coffee &amp; kitchen" />
+          </div>
+          <div class="field">
+            <span>Deskripsi</span>
+            <textarea id="cafeDescription" placeholder="Deskripsi singkat kafe" style="width:100%;height:80px;padding:8px;border:1px solid var(--line);border-radius:10px;font-family:var(--sans);font-size:0.85rem;resize:vertical;"></textarea>
+          </div>
+          <div class="field">
+            <span>Alamat Kafe</span>
+            <input type="text" id="cafeAddress" placeholder="Contoh: Jl. Merdeka No. 24, Tolitoli" />
+          </div>
+          <div class="field">
+            <span>Telepon / WhatsApp</span>
+            <input type="text" id="cafePhone" placeholder="Contoh: 0852-1234-5678" />
+          </div>
+          <div class="save-btns">
+            <button type="button" id="saveConfigBtn">Simpan</button>
+            <button type="button" id="resetConfigBtn">Reset</button>
+          </div>
+
+          <div class="user-admin">
+            <div class="user-admin-head">
+              <h3 class="admin-h3">Akun &amp; Password</h3>
+              <button class="btn btn-ghost user-save-btn" id="saveUsersBtn" type="button">Simpan Password</button>
+            </div>
+            <p class="admin-hint">Ubah password, tambah akun, atau hapus akun. Akun yang sedang dipakai tidak bisa dihapus.</p>
+
+            <div class="user-list" id="userList"></div>
+
+            <div class="user-add">
+              <h4>Tambah Akun Baru</h4>
+              <div class="field">
+                <span>Username</span>
+                <input type="text" id="newUserName" placeholder="cth. kasir2" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" />
+              </div>
+              <div class="field">
+                <span>Password</span>
+                <input type="text" id="newUserPass" placeholder="min. 4 karakter" maxlength="40" autocomplete="off" />
+              </div>
+              <div class="field">
+                <span>Role</span>
+                <select id="newUserRole">
+                  <option value="kasir">Kasir</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-block" id="addUserBtn" type="button">Tambah Akun</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ============================ CHECKOUT MODAL ============================ -->
+  <div class="modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" aria-hidden="true">
+    <div class="modal-card modal-checkout">
+      <button class="icon-btn modal-close" id="closeCheckoutBtn" type="button" aria-label="Tutup pembayaran">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+
+      <header class="modal-head">
+        <p class="drawer-kicker">Langkah terakhir</p>
+        <h2 id="checkoutTitle">Pembayaran</h2>
+        <p class="modal-sub" id="checkoutSub">3 item · Makan di tempat</p>
+      </header>
+
+      <div class="modal-body">
+        <div class="checkout-summary" id="checkoutSummary"></div>
+
+        <fieldset class="pay-methods">
+          <legend>Metode pembayaran</legend>
+          <label class="pay-option">
+            <input type="radio" name="payment" value="tunai" checked />
+            <span class="pay-icon" aria-hidden="true">💵</span>
+            <span class="pay-text"><strong>Tunai</strong><small>Bayar di kasir</small></span>
+            <span class="radio-dot" aria-hidden="true"></span>
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment" value="qris" />
+            <span class="pay-icon" aria-hidden="true">📱</span>
+            <span class="pay-text"><strong>QRIS</strong><small>Scan QR di kasir</small></span>
+            <span class="radio-dot" aria-hidden="true"></span>
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment" value="kartu" />
+            <span class="pay-icon" aria-hidden="true">💳</span>
+            <span class="pay-text"><strong>Kartu Debit</strong><small>Mesin EDC tersedia</small></span>
+            <span class="radio-dot" aria-hidden="true"></span>
+          </label>
+        </fieldset>
+
+        <div class="cash-panel" id="cashPanel">
+          <label class="field">
+            <span>Uang diterima</span>
+            <div class="cash-input">
+              <span>Rp</span>
+              <input type="number" id="cashInput" placeholder="0" min="0" step="1000" inputmode="numeric" />
+            </div>
+          </label>
+          <div class="cash-chips" id="cashChips">
+            <button type="button" data-cash="exact">Uang pas</button>
+            <button type="button" data-cash="50000">50.000</button>
+            <button type="button" data-cash="100000">100.000</button>
+            <button type="button" data-cash="150000">150.000</button>
+          </div>
+          <p class="change-line" id="changeLine">Kembalian <strong>Rp 0</strong></p>
+        </div>
+
+        <p class="checkout-warning" id="checkoutWarning" hidden></p>
+      </div>
+
+      <footer class="modal-foot">
+        <div class="foot-total">
+          <span>Total bayar</span>
+          <strong id="checkoutTotal">Rp 0</strong>
+        </div>
+        <button class="btn btn-primary btn-block" id="placeOrderBtn" type="button">Konfirmasi &amp; Buat Pesanan</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ============================ RECEIPT MODAL ============================ -->
+  <div class="modal" id="receiptModal" role="dialog" aria-modal="true" aria-labelledby="receiptTitle" aria-hidden="true">
+    <div class="modal-card modal-receipt">
+      <div class="receipt-paper" id="receiptPaper">
+        <div class="receipt-brand">
+          <span aria-hidden="true" id="receiptLogo">☕</span>
+          <h2 id="receiptCafeName">KOPI SENJA</h2>
+          <p id="receiptTagline">coffee &amp; kitchen</p>
+          <small id="receiptAddress">Jl. Merdeka No. 24, Tolitoli · 0852-1234-5678</small>
+        </div>
+
+        <div class="receipt-divider"><span></span></div>
+
+        <div class="receipt-meta" id="receiptBody"></div>
+
+        <div class="receipt-divider"><span></span></div>
+
+        <div class="receipt-thanks">
+          <strong id="receiptTitle">Terima kasih! ☕</strong>
+          <p id="receiptNote">Pesananmu sedang kami siapkan. Tunjukkan struk ini di kasir.</p>
+        </div>
+      </div>
+
+      <div class="receipt-actions">
+        <button class="btn btn-ghost" id="printReceiptBtn" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+            <path d="M7 9V4h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M7 14h10v6H7v-6Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+          </svg>
+          Cetak Struk
+        </button>
+        <button class="btn btn-primary" id="doneReceiptBtn" type="button">Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ MOBILE CART BAR ============================ -->
+  <div class="mobile-cart-bar" id="mobileCartBar" hidden>
+    <div class="mcb-info">
+      <span id="mcbCount">0 item</span>
+      <strong id="mcbTotal">Rp 0</strong>
+    </div>
+    <button class="btn btn-primary" id="mcbOpenBtn" type="button">Lihat Keranjang</button>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
