@@ -3,10 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#2A1B12" />
+  <meta name="theme-color" content="#3D2417" />
   <meta name="description" content="Kopi Senja — kasir kedai kopi. Pilih menu, atur pesanan, bayar, dan cetak struk." />
-  <title>Kopi Senja — Kasir & Pemesanan</title>
+  <meta name="application-name" content="Kopi Senja" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Kopi Senja" />
+  <title>Kopi Senja — Kasir &amp; Pemesanan</title>
 
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -79,6 +86,12 @@
           <circle cx="18" cy="20" r="1.4" fill="currentColor"/>
         </svg>
         <span class="cart-badge" id="cartBadge" aria-hidden="true">0</span>
+      </button>
+      <button class="pos-top-btn" id="installAppBtn" type="button" title="Pasang aplikasi" aria-label="Pasang aplikasi" hidden>
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true">
+          <path d="M12 4v10m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 17v1.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
       </button>
       <button class="pos-top-btn" id="btnFullscreen" type="button" title="Layar penuh" aria-label="Layar penuh">⛶</button>
       <button class="pos-top-btn pos-logout" id="logoutBtn" type="button" title="Keluar" aria-label="Keluar dari akun">⏻</button>
@@ -157,7 +170,10 @@
           <p class="drawer-kicker">Mode Kasir</p>
           <h2 id="adminPanelTitle">Keranjang</h2>
         </div>
-        <span class="side-live"><span class="dot-live" aria-hidden="true"></span>Buka</span>
+        <div class="side-head-actions">
+          <span class="side-live"><span class="dot-live" aria-hidden="true"></span>Buka</span>
+          <button class="side-close" id="closeCartBtn" type="button" aria-label="Tutup panel">✕</button>
+        </div>
       </div>
 
       <div class="side-body">
@@ -321,6 +337,15 @@
             <span>Telepon / WhatsApp</span>
             <input type="text" id="cafePhone" placeholder="Contoh: 0852-1234-5678" />
           </div>
+          <div class="field">
+            <span>Catatan Struk — Pesanan Diproses</span>
+            <textarea id="cafeReceiptNoteProcessing" rows="2" placeholder="Pesananmu sedang kami siapkan. Tunjukkan struk ini di kasir."></textarea>
+          </div>
+          <div class="field">
+            <span>Catatan Struk — Pesanan Siap</span>
+            <textarea id="cafeReceiptNoteReady" rows="2" placeholder="Pesananmu sudah siap. Tunjukkan struk ini di kasir untuk mengambil pesanan."></textarea>
+          </div>
+          <p class="admin-hint">Teks ini tampil di bagian bawah struk. Kosongkan untuk memakai teks bawaan.</p>
           <div class="save-btns">
             <button type="button" id="saveConfigBtn">Simpan</button>
             <button type="button" id="resetConfigBtn">Reset</button>
@@ -359,6 +384,8 @@
       </div>
     </aside>
   </main>
+
+  <div class="side-backdrop" id="sideBackdrop" aria-hidden="true"></div>
 
   <!-- ============================ CHECKOUT MODAL ============================ -->
   <div class="modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" aria-hidden="true">

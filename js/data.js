@@ -10,7 +10,9 @@ const CAFE_DEFAULT = {
   tagline: 'coffee & kitchen',
   description: 'Kopi lokal, makanan rumahan, dan camilan manis.',
   address: 'Jl. Merdeka No. 24, Tolitoli',
-  phone: '0852-1234-5678'
+  phone: '0852-1234-5678',
+  receiptNoteProcessing: 'Pesananmu sedang kami siapkan. Tunjukkan struk ini di kasir.',
+  receiptNoteReady: 'Pesananmu sudah siap. Tunjukkan struk ini di kasir untuk mengambil pesanan.'
 };
 
 let CAFE = JSON.parse(localStorage.getItem('cafe_config') || JSON.stringify(CAFE_DEFAULT));

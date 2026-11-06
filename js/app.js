@@ -6,13 +6,20 @@
   'use strict';
 
   /* ------------------------------ KONFIGURASI ------------------------------ */
+  const DEFAULT_RECEIPT_NOTE_PROCESSING =
+    'Pesananmu sedang kami siapkan. Tunjukkan struk ini di kasir.';
+  const DEFAULT_RECEIPT_NOTE_READY =
+    'Pesananmu sudah siap. Tunjukkan struk ini di kasir untuk mengambil pesanan.';
+
   let CAFE = {
     name: 'Kopi Senja',
     logo: '☕',
     tagline: 'coffee & kitchen',
     description: 'Kopi lokal, makanan rumahan, dan camilan manis.',
     address: 'Jl. Merdeka No. 24, Tolitoli',
-    phone: '0852-1234-5678'
+    phone: '0852-1234-5678',
+    receiptNoteProcessing: DEFAULT_RECEIPT_NOTE_PROCESSING,
+    receiptNoteReady: DEFAULT_RECEIPT_NOTE_READY
   };
 
   /* ------------------------------ AKUN & HAK AKSES ------------------------------ */
@@ -142,6 +149,7 @@
     mcbCount: $('mcbCount'),
     mcbTotal: $('mcbTotal'),
     mcbOpen: $('mcbOpenBtn'),
+    sideBackdrop: $('sideBackdrop'),
 
     toasts: $('toasts'),
     heroTakeaway: $('heroTakeawayBtn'),
@@ -155,6 +163,8 @@
     cafeDescription: $('cafeDescription'),
     cafeAddress: $('cafeAddress'),
     cafePhone: $('cafePhone'),
+    receiptNoteProcessing: $('cafeReceiptNoteProcessing'),
+    receiptNoteReady: $('cafeReceiptNoteReady'),
     saveConfigBtn: $('saveConfigBtn'),
     resetConfigBtn: $('resetConfigBtn'),
     cafeNameDisplay: $('cafeNameDisplay'),
@@ -355,17 +365,57 @@
     document.body.classList.toggle('no-scroll', locked);
   }
 
+  function syncDrawer() {
+    const side = document.getElementById('adminPanel');
+    if (!side) return;
+    const backdrop = el.sideBackdrop;
+    const isMobile = window.innerWidth <= 980;
+
+    if (!isMobile) {
+      side.classList.remove('is-open');
+      side.removeAttribute('aria-hidden');
+      side.inert = false;
+      if (backdrop) backdrop.classList.remove('is-open');
+      document.body.classList.remove('side-open');
+      return;
+    }
+
+    const open = side.classList.contains('is-open');
+    side.setAttribute('aria-hidden', open ? 'false' : 'true');
+    side.inert = !open;
+    if (backdrop) backdrop.classList.toggle('is-open', open);
+    document.body.classList.toggle('side-open', open);
+  }
+
   function openDrawer() {
     setAdminTab('cart');
+    if (window.innerWidth > 980) return;
+
     const side = document.getElementById('adminPanel');
-    if (side && window.innerWidth <= 1024) {
-      side.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (!side) return;
+    side.classList.add('is-open');
+    syncDrawer();
+
+    setTimeout(() => {
+      const closeBtn = document.getElementById('closeCartBtn');
+      if (closeBtn) closeBtn.focus({ preventScroll: true });
+    }, 60);
   }
 
   function closeDrawer() {
-    /* Keranjang selalu tersedia di kolom kanan. */
+    const side = document.getElementById('adminPanel');
+    if (!side) return;
+    const wasOpen = side.classList.contains('is-open');
+    side.classList.remove('is-open');
+    syncDrawer();
+
+    if (wasOpen && window.innerWidth <= 980) {
+      const opener = document.getElementById('openCartBtn');
+      if (opener) opener.focus({ preventScroll: true });
+    }
   }
+
+  window.addEventListener('resize', syncDrawer);
 
   function openModal(modal) {
     lastFocused = document.activeElement;
@@ -405,6 +455,7 @@
     if (event.key === 'Escape') {
       if (el.receiptModal.classList.contains('is-open')) return closeModal(el.receiptModal);
       if (el.checkoutModal.classList.contains('is-open')) return closeModal(el.checkoutModal);
+      if (document.body.classList.contains('side-open')) return closeDrawer();
     }
 
     if (event.key === 'Tab') {
@@ -976,8 +1027,8 @@
     el.receiptPaper.scrollTop = 0;
     el.receiptNote.textContent =
       stage === 3
-        ? 'Pesananmu sudah siap. Tunjukkan struk ini di kasir untuk mengambil pesanan.'
-        : 'Pesananmu sedang kami siapkan. Tunjukkan struk ini di kasir.';
+        ? CAFE.receiptNoteReady || DEFAULT_RECEIPT_NOTE_READY
+        : CAFE.receiptNoteProcessing || DEFAULT_RECEIPT_NOTE_PROCESSING;
     openModal(el.receiptModal);
   }
 
@@ -1092,9 +1143,11 @@
   if (el.mcbOpen) el.mcbOpen.addEventListener('click', openDrawer);
   if (el.closeCart) el.closeCart.addEventListener('click', closeDrawer);
   if (el.overlay) el.overlay.addEventListener('click', closeDrawer);
+  if (el.sideBackdrop) el.sideBackdrop.addEventListener('click', closeDrawer);
   if (el.emptyCartBrowse) el.emptyCartBrowse.addEventListener('click', (event) => {
-    if (window.innerWidth <= 1024) {
+    if (window.innerWidth <= 980) {
       event.preventDefault();
+      closeDrawer();
       const menu = document.getElementById('menu');
       if (menu) menu.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -1192,6 +1245,7 @@
 
   el.doneReceipt.addEventListener('click', () => {
     closeModal(el.receiptModal);
+    if (window.innerWidth <= 980) closeDrawer();
     const target = document.getElementById('pesanan');
     if (target) {
       setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 220);
@@ -1342,6 +1396,13 @@
     if (el.cafeDescription) el.cafeDescription.value = CAFE.description || '';
     if (el.cafeAddress) el.cafeAddress.value = CAFE.address || '';
     if (el.cafePhone) el.cafePhone.value = CAFE.phone || '';
+    if (el.receiptNoteProcessing) {
+      el.receiptNoteProcessing.value =
+        CAFE.receiptNoteProcessing || DEFAULT_RECEIPT_NOTE_PROCESSING;
+    }
+    if (el.receiptNoteReady) {
+      el.receiptNoteReady.value = CAFE.receiptNoteReady || DEFAULT_RECEIPT_NOTE_READY;
+    }
   }
 
   function applyBrand() {
@@ -1372,6 +1433,14 @@
     CAFE.description = el.cafeDescription ? el.cafeDescription.value.trim() : '';
     CAFE.address = el.cafeAddress ? el.cafeAddress.value.trim() : '';
     CAFE.phone = el.cafePhone ? el.cafePhone.value.trim() : '';
+    CAFE.receiptNoteProcessing =
+      el.receiptNoteProcessing && el.receiptNoteProcessing.value.trim()
+        ? el.receiptNoteProcessing.value.trim()
+        : DEFAULT_RECEIPT_NOTE_PROCESSING;
+    CAFE.receiptNoteReady =
+      el.receiptNoteReady && el.receiptNoteReady.value.trim()
+        ? el.receiptNoteReady.value.trim()
+        : DEFAULT_RECEIPT_NOTE_READY;
 
     applyBrand();
     try {
@@ -1387,7 +1456,9 @@
       tagline: 'coffee & kitchen',
       description: 'Kopi lokal, makanan rumahan, dan camilan manis.',
       address: 'Jl. Merdeka No. 24, Tolitoli',
-      phone: '0852-1234-5678'
+      phone: '0852-1234-5678',
+      receiptNoteProcessing: DEFAULT_RECEIPT_NOTE_PROCESSING,
+      receiptNoteReady: DEFAULT_RECEIPT_NOTE_READY
     };
     fillCafeForm();
     applyBrand();
@@ -1503,6 +1574,7 @@
     });
 
     if (allowed.indexOf(activeAdminTab) === -1) setAdminTab('cart');
+    syncDrawer();
   }
 
   function login(username, password) {
@@ -2243,6 +2315,83 @@
     }
   }
 
+  /* ------------------------------ PWA / INSTALASI ------------------------------ */
+  function setupPWA() {
+    const installBtn = document.getElementById('installAppBtn');
+    const standalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+
+    if (installBtn) {
+      installBtn.hidden = standalone || location.protocol === 'file:';
+    }
+
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      if (installBtn) {
+        installBtn.hidden = false;
+        installBtn.dataset.installReady = 'true';
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      if (installBtn) {
+        installBtn.hidden = true;
+        delete installBtn.dataset.installReady;
+      }
+      toast('Aplikasi berhasil dipasang');
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          try {
+            const choice = await deferredPrompt.userChoice;
+            if (choice && choice.outcome === 'accepted') {
+              toast('Aplikasi berhasil dipasang');
+            }
+          } catch (e) {}
+          deferredPrompt = null;
+          installBtn.hidden = true;
+          delete installBtn.dataset.installReady;
+          return;
+        }
+
+        if (
+          window.navigator.standalone === true ||
+          window.matchMedia('(display-mode: standalone)').matches
+        ) {
+          toast('Aplikasi sudah terpasang di perangkat ini');
+          return;
+        }
+
+        if (location.protocol === 'file:') {
+          toast('Buka lewat http/https (bukan file) untuk memasang aplikasi', 'error');
+          return;
+        }
+
+        const ua = navigator.userAgent || '';
+        const isIOS =
+          /iphone|ipad|ipod/i.test(ua) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (isIOS) {
+          toast('Di iPhone/iPad: tombol Bagikan → "Tambahkan ke Layar Utama"');
+        } else {
+          toast('Buka menu browser → "Instal aplikasi" / "Tambahkan ke layar utama"');
+        }
+      });
+    }
+
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  }
+
   function init() {
     // Muat konfigurasi kafe tersimpan
     try {
@@ -2255,7 +2404,10 @@
           tagline: parsed.tagline || 'coffee & kitchen',
           description: parsed.description || '',
           address: parsed.address || 'Jl. Merdeka No. 24, Tolitoli',
-          phone: parsed.phone || '0852-1234-5678'
+          phone: parsed.phone || '0852-1234-5678',
+          receiptNoteProcessing:
+            parsed.receiptNoteProcessing || DEFAULT_RECEIPT_NOTE_PROCESSING,
+          receiptNoteReady: parsed.receiptNoteReady || DEFAULT_RECEIPT_NOTE_READY
         };
       }
     } catch (e) {}
@@ -2312,6 +2464,8 @@
         }
       });
     }
+
+    setupPWA();
 
     el.header.classList.toggle('is-scrolled', window.scrollY > 8);
 
