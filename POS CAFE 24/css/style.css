@@ -3384,67 +3384,46 @@ section {
 
 @media print {
   @page {
-    margin: 10mm;
-    size: auto;
+    size: 58mm auto;
+    margin: 0;
   }
 
   body {
-    background: #fff !important;
+    width: 58mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  body > *:not(#receiptModal) {
-    display: none !important;
+  body * {
+    visibility: hidden;
+  }
+
+  #receiptModal,
+  #receiptModal * {
+    visibility: visible;
   }
 
   #receiptModal {
-    position: static !important;
-    display: block !important;
-    inset: auto !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 58mm !important;
+    margin: 0 !important;
     padding: 0 !important;
-    background: #fff !important;
-    backdrop-filter: none !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    background: white !important;
   }
 
   #receiptModal .modal-card {
-    max-width: 100% !important;
-    max-height: none !important;
-    background: #fff !important;
+    width: 58mm !important;
+    max-width: 58mm !important;
+    margin: 0 !important;
+    padding: 3mm !important;
     box-shadow: none !important;
-    border-radius: 0 !important;
-    transform: none !important;
-    overflow: visible !important;
+    border: none !important;
   }
 
-  .receipt-paper {
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    background-image: none !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    max-height: none !important;
-  }
-
-  .receipt-paper::before,
-  .receipt-actions,
-  .toasts,
-  .mobile-cart-bar {
+  #receiptModal button {
     display: none !important;
-  }
-
-  .receipt-brand h2 { color: #000 !important; }
-  .receipt-meta, .rm-item, .rm-total { color: #000 !important; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
   }
 }
 
