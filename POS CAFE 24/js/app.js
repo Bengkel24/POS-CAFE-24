@@ -1792,11 +1792,10 @@
     );
   }
 
-  function printOrderReceipt(order) {
-    if (!currentUser || currentUser.role !== 'admin') {
-      toast('Hanya admin yang bisa mencetak dari dashboard', 'error');
-      return;
-    }
+ function printOrderReceipt(order) {
+  openReceipt(order);
+  setTimeout(() => window.print(), 350);
+}
     openReceipt(order);
     window.print();
   }
