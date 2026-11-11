@@ -2443,6 +2443,17 @@
       showLogin();
     }
 
+    /* lisensi & masa gratis */
+    if (window.KopisenjaLicense) {
+      window.KopisenjaLicense.init({ appName: CAFE.name, logo: CAFE.logo }).catch(() => {});
+      window.addEventListener('kopisenja:license', (event) => {
+        const detail = event.detail || {};
+        if (detail.message) {
+          toast(detail.message, detail.type === 'error' ? 'error' : undefined);
+        }
+      });
+    }
+
     /* jam & layar penuh */
     const clockEl = document.getElementById('clock');
     if (clockEl) {

@@ -4,18 +4,21 @@
    Naikkan CACHE_VERSION setiap kali file aplikasi diubah.
    ========================================================= */
 
-const CACHE_VERSION = 'kopisenja-v2';
+const CACHE_VERSION = 'kopisenja-v7';
 const APP_SHELL = [
   './',
   './index.html',
   './css/style.css',
   './js/app.js',
   './js/data.js',
+  './js/license-config.js',
+  './js/license.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/apple-touch-icon.png',
+  './icons/qris-placeholder.svg'
 ];
 
 self.addEventListener('install', (event) => {

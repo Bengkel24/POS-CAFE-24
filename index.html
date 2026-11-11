@@ -57,8 +57,95 @@
       </form>
 
       <p class="login-foot">🔒 Admin &amp; Kasir · data tersimpan di perangkat ini</p>
+      <p class="login-license">
+        <span id="loginLicenseStatus">Masa gratis: 7 hari</span>
+        <button class="login-license-btn" type="button" id="loginLicenseBtn">Lisensi &amp; pembayaran</button>
+      </p>
     </div>
   </div>
+
+  <!-- ============================ LISENSI ============================ -->
+  <section class="license-screen" id="licenseScreen" role="dialog" aria-modal="true" aria-labelledby="licenseTitle">
+    <div class="license-shell">
+      <button class="license-close" id="licenseCloseBtn" type="button" aria-label="Tutup lisensi" hidden>×</button>
+
+      <header class="license-brand">
+        <span class="license-logo" id="licenseLogo" aria-hidden="true">☕</span>
+        <div>
+          <p class="drawer-kicker">Lisensi aplikasi</p>
+          <h1 id="licenseTitle">Aktifkan <em>Kopi Senja</em></h1>
+          <p class="license-sub" id="licenseSub">Masa gratis 7 hari untuk mencoba semua fitur.</p>
+        </div>
+      </header>
+
+      <div class="license-status" id="licenseStatus">
+        <span class="license-badge is-active" id="licenseStatusBadge">Trial</span>
+        <p id="licenseStatusText">Masa gratis aktif — sisa 7 hari</p>
+      </div>
+
+      <div class="license-plans">
+        <article class="license-plan">
+          <p class="plan-kicker">Langganan</p>
+          <h2>Bulanan</h2>
+          <p class="plan-price" id="licensePriceMonthly">Rp 50.000 <span>/ bulan</span></p>
+          <ul class="plan-list">
+            <li>Akses penuh selama 30 hari</li>
+            <li>Perpanjang kapan saja</li>
+            <li>Cocok untuk kedai yang baru mulai</li>
+          </ul>
+        </article>
+        <article class="license-plan is-featured">
+          <p class="plan-kicker">Sekali bayar</p>
+          <h2>Lifetime</h2>
+          <p class="plan-price" id="licensePriceLifetime">Rp 500.000</p>
+          <ul class="plan-list">
+            <li>Pakai selamanya, tanpa batas waktu</li>
+            <li>Tanpa biaya bulanan</li>
+            <li>Paling hemat untuk jangka panjang</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="license-payment">
+        <div class="license-payment-head">
+          <h2>Bayar &amp; aktivasi</h2>
+          <p>Transfer sesuai paket, lalu kirim bukti pembayaran ke owner. Setelah dikonfirmasi, kamu akan menerima kode aktivasi.</p>
+        </div>
+
+        <div class="payment-grid">
+          <div class="payment-bank">
+            <p><span>Bank</span><strong id="licenseBankName">-</strong></p>
+            <p><span>No. rekening</span><strong id="licenseBankAccount">-</strong></p>
+            <p><span>Atas nama</span><strong id="licenseBankHolder">-</strong></p>
+            <p><span>WhatsApp</span><strong id="licenseWhatsapp">-</strong></p>
+          </div>
+          <figure class="payment-qris">
+            <img id="licenseQris" src="icons/qris-placeholder.svg" alt="QRIS pembayaran" />
+            <p class="qris-fallback" id="licenseQrisFallback" hidden>QRIS belum diatur. Hubungi owner untuk detail pembayaran.</p>
+            <figcaption>Scan QRIS (DANA, OVO, GoPay, atau bank)</figcaption>
+          </figure>
+        </div>
+
+        <div class="license-code-box">
+          <label for="licenseCodeInput">Sudah bayar? Masukkan kode aktivasi</label>
+          <div class="license-code-row">
+            <input id="licenseCodeInput" type="text" placeholder="KS1-..." autocomplete="off" autocapitalize="none" spellcheck="false" />
+            <button class="btn btn-primary" id="licenseActivateBtn" type="button">Aktifkan</button>
+          </div>
+          <p class="license-message" id="licenseMessage" role="status"></p>
+        </div>
+
+        <p class="license-device">
+          Kode perangkat: <code id="licenseDeviceId">-</code>
+          <button class="license-copy" id="licenseCopyDevice" type="button">Salin</button>
+        </p>
+      </div>
+
+      <p class="license-foot">
+        Butuh bantuan? Hubungi <span id="licenseContact">owner</span>.
+      </p>
+    </div>
+  </section>
 
   <!-- ============================ TOP BAR ============================ -->
   <header class="pos-top" id="siteHeader">
@@ -380,6 +467,15 @@
               <button class="btn btn-primary btn-block" id="addUserBtn" type="button">Tambah Akun</button>
             </div>
           </div>
+
+          <div class="license-admin">
+            <div class="license-admin-head">
+              <h3 class="admin-h3">Lisensi Aplikasi</h3>
+              <button class="btn btn-ghost" id="adminLicenseBtn" type="button">Kelola lisensi</button>
+            </div>
+            <p class="admin-hint" id="adminLicenseStatus">Memeriksa lisensi…</p>
+            <p class="admin-hint">Masa gratis 7 hari. Setelah itu pilih langganan bulanan atau lifetime. Kode aktivasi dikirim owner setelah pembayaran.</p>
+          </div>
         </section>
       </div>
     </aside>
@@ -488,6 +584,7 @@
         </button>
         <button class="btn btn-primary" id="doneReceiptBtn" type="button">Selesai</button>
       </div>
+      <p class="receipt-print-hint">Di HP: pilih printer thermal 58mm di dialog cetak.</p>
     </div>
   </div>
 
@@ -503,6 +600,8 @@
   <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 
   <script src="js/data.js"></script>
+  <script src="js/license-config.js"></script>
+  <script src="js/license.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

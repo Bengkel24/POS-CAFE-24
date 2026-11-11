@@ -1,5 +1,5 @@
 /* =========================================================
-   Kopi Senja — Stylesheet
+   kopi senja — Stylesheet
    ========================================================= */
 
 :root {
@@ -3116,6 +3116,14 @@ section {
   background: rgba(255, 253, 248, 0.22);
 }
 
+.receipt-print-hint {
+  margin: -8px 0 0;
+  text-align: center;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: rgba(255, 246, 234, 0.72);
+}
+
 /* ============================== TOASTS ============================== */
 
 .toasts {
@@ -3384,16 +3392,23 @@ section {
   .order-progress { gap: 2px; }
 }
 
-/* ============================== PRINT ============================== */
+/* ============================== PRINT — STRUK 58mm ============================== */
 
 @media print {
   @page {
-    margin: 10mm;
-    size: auto;
+    /* Lebar kertas thermal 58mm; tinggi mengikuti panjang struk. */
+    size: 58mm auto;
+    margin: 0;
   }
 
+  html,
   body {
+    width: 58mm !important;
+    max-width: 58mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: #fff !important;
+    color: #000 !important;
   }
 
   body > *:not(#receiptModal) {
@@ -3404,16 +3419,25 @@ section {
     position: static !important;
     display: block !important;
     inset: auto !important;
+    width: 58mm !important;
+    max-width: 58mm !important;
+    margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     opacity: 1 !important;
     visibility: visible !important;
   }
 
-  #receiptModal .modal-card {
-    max-width: 100% !important;
+  #receiptModal .modal-card,
+  #receiptModal .modal-receipt {
+    width: 58mm !important;
+    max-width: 58mm !important;
     max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
     background: #fff !important;
     box-shadow: none !important;
     border-radius: 0 !important;
@@ -3422,23 +3446,191 @@ section {
   }
 
   .receipt-paper {
+    width: 58mm !important;
+    max-width: 58mm !important;
+    margin: 0 !important;
+    /* 58mm - (2 x 5mm) = 48mm area cetak, aman untuk printer 58mm. */
+    padding: 2.5mm 5mm !important;
+    background: #fff !important;
+    background-image: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    background-image: none !important;
-    padding: 0 !important;
     overflow: visible !important;
     max-height: none !important;
+    color: #000 !important;
   }
 
   .receipt-paper::before,
   .receipt-actions,
+  .receipt-print-hint,
   .toasts,
   .mobile-cart-bar {
     display: none !important;
   }
 
-  .receipt-brand h2 { color: #000 !important; }
-  .receipt-meta, .rm-item, .rm-total { color: #000 !important; }
+  /* ---------- Brand / header ---------- */
+  .receipt-brand {
+    padding-top: 0 !important;
+    text-align: center !important;
+  }
+
+  .receipt-brand > span {
+    font-size: 12pt !important;
+    line-height: 1 !important;
+    margin-bottom: 1mm !important;
+  }
+
+  .receipt-brand h2 {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 12pt !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.04em !important;
+    color: #000 !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .receipt-brand p {
+    margin-top: 0.8mm !important;
+    font-size: 7pt !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0.14em !important;
+    color: #000 !important;
+  }
+
+  .receipt-brand small {
+    margin-top: 1mm !important;
+    font-size: 7pt !important;
+    line-height: 1.35 !important;
+    color: #000 !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .receipt-divider {
+    margin: 2mm 0 !important;
+    gap: 1.5mm !important;
+    color: #000 !important;
+  }
+
+  .receipt-divider::before,
+  .receipt-divider::after {
+    border-top: 1px dashed #000 !important;
+  }
+
+  .receipt-divider span {
+    font-size: 6pt !important;
+  }
+
+  /* ---------- Baris meta ---------- */
+  .receipt-meta {
+    gap: 0.8mm !important;
+    color: #000 !important;
+  }
+
+  .rm-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 2mm !important;
+    font-size: 8pt !important;
+    line-height: 1.3 !important;
+    color: #000 !important;
+  }
+
+  .rm-row span,
+  .rm-row b {
+    color: #000 !important;
+  }
+
+  .rm-row span:first-child {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .rm-row b {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    font-family: "Courier New", monospace !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    text-align: right !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* ---------- Daftar item ---------- */
+  .rm-items {
+    margin: 2mm 0 !important;
+    gap: 1.2mm !important;
+  }
+
+  .rm-item {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto !important;
+    gap: 1.2mm !important;
+    align-items: start !important;
+    font-size: 8pt !important;
+    line-height: 1.3 !important;
+    color: #000 !important;
+  }
+
+  .rm-item .rm-name {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .rm-item .rm-name em {
+    font-size: 7pt !important;
+    line-height: 1.3 !important;
+    color: #000 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .rm-item .rm-qty {
+    font-size: 7.5pt !important;
+    color: #000 !important;
+  }
+
+  .rm-item .rm-price {
+    font-size: 8pt !important;
+    color: #000 !important;
+  }
+
+  /* ---------- Total & pembayaran ---------- */
+  .rm-total {
+    margin-top: 0.5mm !important;
+    padding-top: 1.5mm !important;
+    border-top: 1px dashed #000 !important;
+    font-size: 9.5pt !important;
+    line-height: 1.3 !important;
+    color: #000 !important;
+  }
+
+  .rm-pay {
+    margin-top: 1.5mm !important;
+    padding-top: 1.5mm !important;
+    border-top: 1px dashed #000 !important;
+    gap: 0.6mm !important;
+  }
+
+  /* ---------- Footer ---------- */
+  .receipt-thanks {
+    text-align: center !important;
+  }
+
+  .receipt-thanks strong {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 9pt !important;
+    color: #000 !important;
+  }
+
+  .receipt-thanks p {
+    margin-top: 1mm !important;
+    max-width: none !important;
+    font-size: 7pt !important;
+    line-height: 1.35 !important;
+    color: #000 !important;
+    overflow-wrap: break-word !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5153,4 +5345,605 @@ body.is-locked .mobile-cart-bar {
 }
 
 
+/* =========================================================
+   LISENSI & PEMBAYARAN
+   ========================================================= */
 
+.license-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: block;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 16px 36px;
+  background:
+    radial-gradient(900px 520px at 18% 0%, rgba(185, 111, 63, 0.38), transparent 62%),
+    radial-gradient(820px 520px at 100% 100%, rgba(42, 27, 18, 0.55), transparent 60%),
+    rgba(42, 27, 18, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.license-screen[hidden] {
+  display: none !important;
+}
+
+.license-shell {
+  position: relative;
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: clamp(22px, 4vw, 36px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+  animation: licenseIn 0.45s var(--ease) both;
+}
+
+@keyframes licenseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.license-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--coffee);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.16s var(--ease), transform 0.16s var(--ease);
+}
+
+.license-close:hover {
+  background: var(--cream-2);
+  transform: rotate(90deg);
+}
+
+.license-close[hidden] {
+  display: none !important;
+}
+
+.license-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-right: 44px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.license-logo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 54px;
+  height: 54px;
+  border-radius: 17px;
+  background: linear-gradient(150deg, var(--coffee) 0%, #4a2c1b 100%);
+  color: var(--cream);
+  font-size: 1.45rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.license-brand h1 {
+  margin: 2px 0 4px;
+  font-family: var(--serif);
+  font-size: clamp(1.55rem, 3vw, 2.05rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--coffee);
+  line-height: 1.15;
+}
+
+.license-brand h1 em {
+  color: var(--caramel-dark);
+  font-style: italic;
+}
+
+.license-sub {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.license-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(61, 122, 95, 0.24);
+  border-radius: 14px;
+  background: var(--green-soft);
+}
+
+.license-status.is-inactive {
+  border-color: rgba(180, 71, 47, 0.24);
+  background: #fdecea;
+}
+
+.license-status p {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.license-badge {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.license-badge.is-active {
+  background: var(--green);
+  color: #fff;
+}
+
+.license-badge.is-inactive {
+  background: var(--red);
+  color: #fff;
+}
+
+.license-plans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.license-plan {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.license-plan.is-featured {
+  border-color: transparent;
+  background: linear-gradient(155deg, var(--coffee) 0%, #4a2c1b 100%);
+  color: var(--cream);
+  box-shadow: var(--shadow-md);
+}
+
+.plan-kicker {
+  margin: 0 0 4px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--caramel-dark);
+}
+
+.license-plan.is-featured .plan-kicker {
+  color: var(--amber);
+}
+
+.license-plan h2 {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.plan-price {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--coffee);
+}
+
+.license-plan.is-featured .plan-price {
+  color: var(--cream);
+}
+
+.plan-price span {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink-faint);
+}
+
+.license-plan.is-featured .plan-price span {
+  color: rgba(251, 245, 236, 0.72);
+}
+
+.plan-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-list li {
+  position: relative;
+  padding-left: 19px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.license-plan.is-featured .plan-list li {
+  color: rgba(251, 245, 236, 0.82);
+}
+
+.plan-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 800;
+  color: var(--green);
+}
+
+.license-plan.is-featured .plan-list li::before {
+  color: var(--amber);
+}
+
+.license-payment {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--cream);
+}
+
+.license-payment-head h2 {
+  margin: 0 0 4px;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--coffee);
+}
+
+.license-payment-head p {
+  margin: 0 0 16px;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.payment-bank {
+  min-width: 0;
+}
+
+.payment-bank p {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.payment-bank p:last-child {
+  border-bottom: 0;
+}
+
+.payment-bank p span {
+  flex: none;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+.payment-bank p strong {
+  min-width: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: right;
+  color: var(--coffee);
+  word-break: break-word;
+}
+
+.payment-bank p strong a {
+  color: var(--caramel-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.payment-qris {
+  margin: 0;
+  text-align: center;
+}
+
+.payment-qris img {
+  display: block;
+  width: 100%;
+  max-width: 210px;
+  height: auto;
+  margin: 0 auto 8px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.payment-qris figcaption {
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--ink-faint);
+}
+
+.qris-fallback {
+  margin: 0 auto 8px;
+  padding: 22px 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 14px;
+  background: var(--cream-2);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.qris-fallback[hidden] {
+  display: none !important;
+}
+
+.license-code-box {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+
+.license-code-box > label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--coffee);
+}
+
+.license-code-row {
+  display: flex;
+  gap: 8px;
+}
+
+.license-code-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.01em;
+}
+
+.license-code-row input:focus {
+  outline: 2px solid rgba(185, 111, 63, 0.4);
+  outline-offset: 1px;
+}
+
+.license-code-row .btn {
+  flex: none;
+  min-width: 122px;
+  padding: 12px 16px;
+  border-radius: 12px;
+}
+
+.license-message {
+  min-height: 1.2em;
+  margin: 8px 0 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.license-message.is-error {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.license-message.is-success {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.license-device {
+  margin: 14px 0 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.license-device code {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--cream-2);
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  word-break: break-all;
+  vertical-align: middle;
+}
+
+.license-copy {
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--caramel-dark);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.license-foot {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+/* baris lisensi di layar login */
+.login-license {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 10px;
+  margin: 10px 0 0;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.login-license-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--caramel-dark);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* kartu lisensi di tab Kafe */
+.license-admin {
+  margin-top: 18px;
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+.license-admin-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.license-admin h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--coffee);
+}
+
+.license-admin .btn {
+  padding: 7px 11px;
+  font-size: 0.72rem;
+}
+
+.license-admin .admin-hint {
+  margin: 6px 0 0;
+}
+
+.license-admin .admin-hint:first-of-type {
+  font-weight: 700;
+  color: var(--coffee);
+}
+
+@media (max-width: 720px) {
+  .license-screen {
+    padding: 12px;
+  }
+
+  .license-shell {
+    padding: 22px 16px 28px;
+    border-radius: 22px;
+  }
+
+  .license-plans {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-qris img {
+    max-width: 190px;
+  }
+
+  .license-code-row {
+    flex-direction: column;
+  }
+
+  .license-code-row .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .license-brand {
+    gap: 10px;
+    padding-right: 38px;
+  }
+
+  .license-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    font-size: 1.25rem;
+  }
+
+  .license-brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .license-status {
+    align-items: flex-start;
+  }
+
+  .license-plan,
+  .license-payment {
+    padding: 16px;
+  }
+
+  .license-admin-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .license-admin .btn {
+    width: 100%;
+  }
+}
