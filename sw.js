@@ -4,7 +4,7 @@
    Naikkan CACHE_VERSION setiap kali file aplikasi diubah.
    ========================================================= */
 
-const CACHE_VERSION = 'kopisenja-v7';
+const CACHE_VERSION = 'kopisenja-v8';
 const APP_SHELL = [
   './',
   './index.html',

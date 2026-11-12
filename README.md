@@ -352,7 +352,14 @@ Contoh menambah menu:
   untuk kertas thermal **58mm** (area cetak ±48mm): lebar halaman, ukuran font,
   dan pemenggalan teks sudah disesuaikan. Di HP, buka struk lalu tekan
   **Cetak Struk** dan pilih printer thermal 58mm di dialog cetak.
-- Untuk printer 80mm, ubah `@page` dan lebar `.receipt-paper` di bagian
-  `PRINT — STRUK 58mm` pada `css/style.css`.
+- Tinggi halaman cetak dihitung otomatis oleh `app.js` sebelum `window.print()`
+  (style `#receiptPageSize`), jadi struk panjang tidak terpotong dan tidak
+  menyisakan kertas kosong berlebihan. `@page` di `css/style.css` hanya menjadi
+  fallback **58mm × 200mm** karena Chrome tidak mendukung `size: 58mm auto`.
+- Jika dialog cetak masih menampilkan ukuran Letter/A4, pilih paper size
+  **58mm** (atau roll paper) milik printer thermal; ukuran halaman dari browser
+  hanyalah petunjuk, ukuran fisik tetap ditentukan driver printer.
+- Untuk printer 80mm, ubah `@page`, `RECEIPT_PAGE_WIDTH_MM` di `js/app.js`, dan
+  lebar `.receipt-paper` di bagian `PRINT — STRUK 58mm` pada `css/style.css`.
 - Breakpoint responsif: ≤980px panel kanan menjadi drawer, ≤640px katalog satu kolom,
   ≤420px bilah atas dipadatkan (tombol layar penuh disembunyikan di layar sangat kecil).

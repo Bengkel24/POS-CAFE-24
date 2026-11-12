@@ -1030,6 +1030,128 @@
         ? CAFE.receiptNoteReady || DEFAULT_RECEIPT_NOTE_READY
         : CAFE.receiptNoteProcessing || DEFAULT_RECEIPT_NOTE_PROCESSING;
     openModal(el.receiptModal);
+
+    /* Ukur tinggi struk saat modal dibuka, supaya tombol Cetak bisa
+       langsung memanggil window.print() di dalam gesture pengguna. */
+    receiptPrintHeightMm = 0;
+    measureReceiptHeightMm()
+      .then(function (heightMm) {
+        receiptPrintHeightMm = heightMm;
+      })
+      .catch(function () {});
+  }
+
+  /* --------------------------- CETAK STRUK 58mm --------------------------- */
+  const RECEIPT_PAGE_WIDTH_MM = 58;
+  const RECEIPT_PAGE_MIN_MM = 80;
+  const RECEIPT_PAGE_MAX_MM = 1000;
+  const RECEIPT_PAGE_FALLBACK_MM = 200;
+  let receiptPrintHeightMm = 0;
+
+  function setReceiptPageSize(heightMm) {
+    let style = document.getElementById('receiptPageSize');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'receiptPageSize';
+      style.media = 'print';
+      document.head.appendChild(style);
+    }
+    const safe = Math.max(
+      RECEIPT_PAGE_MIN_MM,
+      Math.min(RECEIPT_PAGE_MAX_MM, Math.ceil(Number(heightMm) || 150))
+    );
+    style.textContent =
+      '@page { size: ' + RECEIPT_PAGE_WIDTH_MM + 'mm ' + safe + 'mm; margin: 0; }';
+  }
+
+  function collectPrintCss() {
+    let printCss = '';
+    try {
+      for (const sheet of document.styleSheets) {
+        let rules;
+        try {
+          rules = sheet.cssRules;
+        } catch (e) {
+          continue;
+        }
+        for (const rule of rules) {
+          if (
+            rule.type === CSSRule.MEDIA_RULE &&
+            rule.conditionText &&
+            rule.conditionText.indexOf('print') !== -1
+          ) {
+            printCss += rule.cssText.replace(/@media[^{]+\{/, '@media screen {');
+          }
+        }
+      }
+    } catch (e) {}
+    return printCss;
+  }
+
+  async function measureReceiptHeightMm() {
+    const modal = el.receiptModal;
+    if (!modal) return 150;
+
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.cssText =
+      'position:fixed;left:-10000px;top:0;width:58mm;height:2000px;border:0;visibility:hidden;';
+    document.body.appendChild(iframe);
+
+    try {
+      const cssHref = new URL('css/style.css', location.href).href;
+      const html =
+        '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+        '<link rel="stylesheet" href="' + cssHref + '">' +
+        '<style>' + collectPrintCss() + '</style>' +
+        '</head><body>' + modal.outerHTML + '</body></html>';
+
+      await new Promise(function (resolve) {
+        let done = false;
+        const finish = function () {
+          if (done) return;
+          done = true;
+          resolve();
+        };
+        iframe.onload = finish;
+        setTimeout(finish, 1200);
+        iframe.srcdoc = html;
+      });
+
+      const doc = iframe.contentDocument;
+      if (!doc) return 150;
+      if (doc.fonts && doc.fonts.ready) {
+        try {
+          await doc.fonts.ready;
+        } catch (e) {}
+      }
+      await new Promise(function (resolve) {
+        setTimeout(resolve, 60);
+      });
+
+      const paper = doc.getElementById('receiptPaper');
+      const heightPx = paper ? paper.scrollHeight : 0;
+      if (!heightPx) return 150;
+      return Math.ceil((heightPx / 96) * 25.4) + 3;
+    } finally {
+      iframe.remove();
+    }
+  }
+
+  function printReceipt() {
+    if (receiptPrintHeightMm) {
+      setReceiptPageSize(receiptPrintHeightMm);
+    } else {
+      /* Fallback aman kalau pengukuran belum selesai: tetap 58mm,
+         tinggi 200mm supaya struk tidak terpotong. */
+      setReceiptPageSize(RECEIPT_PAGE_FALLBACK_MM);
+      measureReceiptHeightMm()
+        .then(function (heightMm) {
+          receiptPrintHeightMm = heightMm;
+        })
+        .catch(function () {});
+    }
+    window.print();
   }
 
   function renderOrders() {
@@ -1257,7 +1379,7 @@
   });
 
   el.printReceipt.addEventListener('click', () => {
-    window.print();
+    printReceipt();
   });
 
   if (el.ordersList) el.ordersList.addEventListener('click', (event) => {
@@ -1798,7 +1920,7 @@
       return;
     }
     openReceipt(order);
-    window.print();
+    printReceipt();
   }
 
   function deleteOrder(orderId) {

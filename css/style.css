@@ -3396,8 +3396,10 @@ section {
 
 @media print {
   @page {
-    /* Lebar kertas thermal 58mm; tinggi mengikuti panjang struk. */
-    size: 58mm auto;
+    /* Lebar kertas thermal 58mm. Chrome tidak mendukung "58mm auto",
+       jadi tinggi memakai nilai aman; app.js menghitung tinggi struk
+       secara dinamis sebelum window.print() lewat #receiptPageSize. */
+    size: 58mm 200mm;
     margin: 0;
   }
 
