@@ -349,16 +349,36 @@ Contoh menambah menu:
   dicadangkan di cookie `kopisenja_trial_start` dan IndexedDB `kopisenja-license`
   agar tidak mudah ter-reset hanya dengan menghapus `localStorage`.
 - Layout cetak hanya menampilkan struk, bukan seluruh halaman. Struk dioptimalkan
-  untuk kertas thermal **58mm** (area cetak ±48mm): lebar halaman, ukuran font,
-  dan pemenggalan teks sudah disesuaikan. Di HP, buka struk lalu tekan
+  untuk kertas thermal **58mm** dengan area cetak **44mm** (padding samping 7mm),
+  lebih sempit dari area cetak maksimum 48mm agar printer 58mm seperti **VSC**
+  tidak memotong sisi kanan. Padding bawah 8mm memberi ruang margin bawah printer
+  supaya baris terakhir tidak terpotong. Di HP, buka struk lalu tekan
   **Cetak Struk** dan pilih printer thermal 58mm di dialog cetak.
+- Struk yang tampil di aplikasi adalah **pratinjau 58mm** yang dirender dengan
+  CSS cetak yang sama (`#receiptPreviewFrame`), jadi tampilan di layar = hasil
+  cetak. Pratinjau bisa digulir; teks **Gulir** di bagian bawah menandakan masih
+  ada isi struk di bawahnya. Saat dicetak, pratinjau dan tombol aksi tidak ikut
+  tercetak; hanya struk 58mm yang keluar.
 - Tinggi halaman cetak dihitung otomatis oleh `app.js` sebelum `window.print()`
   (style `#receiptPageSize`), jadi struk panjang tidak terpotong dan tidak
   menyisakan kertas kosong berlebihan. `@page` di `css/style.css` hanya menjadi
   fallback **58mm × 200mm** karena Chrome tidak mendukung `size: 58mm auto`.
 - Jika dialog cetak masih menampilkan ukuran Letter/A4, pilih paper size
   **58mm** (atau roll paper) milik printer thermal; ukuran halaman dari browser
-  hanyalah petunjuk, ukuran fisik tetap ditentukan driver printer.
+  hanyalah petunjuk, ukuran fisik tetap ditentukan driver printer. Jika driver
+  hanya menampilkan "58mm", cari pengaturan **paper length / form length** dan
+  pilih **Auto/Continuous/297mm**, bukan 58mm persegi. Set juga **paper type**
+  ke **Continuous/Receipt** (bukan label/gap) agar printer tidak memotong
+  berdasarkan sensor gap.
+- Jika menu print sama sekali tidak punya pilihan paper size 58mm, tekan
+  **Simpan PDF 58mm** di struk (atau pilih **Save as PDF** di dialog cetak).
+  Halaman PDF sudah otomatis 58mm × tinggi struk. Cetak PDF tersebut dari
+  aplikasi printer **VSC/RawBT**; aplikasi printer sudah tahu lebar kertasnya,
+  jadi tidak perlu menyetel paper size di setiap laptop/HP.
+- Web tidak bisa menambahkan pilihan paper size baru ke menu print browser/OS;
+  daftar itu berasal dari driver printer. Yang bisa dilakukan aplikasi adalah
+  memaksa ukuran halaman dokumen (sudah otomatis 58mm) dan menyediakan PDF
+  58mm sebagai jalur yang tidak bergantung pada menu paper size.
 - Untuk printer 80mm, ubah `@page`, `RECEIPT_PAGE_WIDTH_MM` di `js/app.js`, dan
   lebar `.receipt-paper` di bagian `PRINT — STRUK 58mm` pada `css/style.css`.
 - Breakpoint responsif: ≤980px panel kanan menjadi drawer, ≤640px katalog satu kolom,

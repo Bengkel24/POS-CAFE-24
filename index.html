@@ -554,6 +554,19 @@
   <!-- ============================ RECEIPT MODAL ============================ -->
   <div class="modal" id="receiptModal" role="dialog" aria-modal="true" aria-labelledby="receiptTitle" aria-hidden="true">
     <div class="modal-card modal-receipt">
+      <div class="receipt-preview-head">
+        <span>Pratinjau struk 58mm</span>
+        <small>Tampilan ini sama dengan hasil cetak</small>
+      </div>
+
+      <div class="receipt-preview-shell">
+        <div class="receipt-preview" id="receiptPreviewWrap">
+          <div class="receipt-preview-spacer" id="receiptPreviewSpacer"></div>
+          <iframe id="receiptPreviewFrame" title="Pratinjau struk 58mm" scrolling="no" tabindex="-1" aria-hidden="true"></iframe>
+        </div>
+        <div class="receipt-preview-fade" aria-hidden="true">Gulir ⌄</div>
+      </div>
+
       <div class="receipt-paper" id="receiptPaper">
         <div class="receipt-brand">
           <span aria-hidden="true" id="receiptLogo">☕</span>
@@ -584,7 +597,11 @@
         </button>
         <button class="btn btn-primary" id="doneReceiptBtn" type="button">Selesai</button>
       </div>
-      <p class="receipt-print-hint">Di HP: pilih printer thermal 58mm di dialog cetak.</p>
+      <p class="receipt-print-hint">
+        Ukuran halaman otomatis 58mm. Tidak ada pilihan 58mm di dialog cetak?
+        <button type="button" class="receipt-pdf-link" id="saveReceiptPdfBtn">Simpan PDF 58mm</button>
+        lalu cetak PDF dari aplikasi printer VSC/RawBT.
+      </p>
     </div>
   </div>
 

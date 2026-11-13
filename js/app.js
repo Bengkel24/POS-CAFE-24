@@ -138,11 +138,15 @@
     receiptModal: $('receiptModal'),
     receiptBody: $('receiptBody'),
     receiptPaper: $('receiptPaper'),
+    receiptPreviewWrap: $('receiptPreviewWrap'),
+    receiptPreviewFrame: $('receiptPreviewFrame'),
+    receiptPreviewSpacer: $('receiptPreviewSpacer'),
     receiptNote: $('receiptNote'),
     receiptCafeName: $('receiptCafeName'),
     receiptTagline: $('receiptTagline'),
     receiptLogo: $('receiptLogo'),
     printReceipt: $('printReceiptBtn'),
+    saveReceiptPdf: $('saveReceiptPdfBtn'),
     doneReceipt: $('doneReceiptBtn'),
 
     mobileBar: $('mobileCartBar'),
@@ -1031,6 +1035,10 @@
         : CAFE.receiptNoteProcessing || DEFAULT_RECEIPT_NOTE_PROCESSING;
     openModal(el.receiptModal);
 
+    /* Tampilkan pratinjau 58mm yang dirender dengan CSS cetak, sehingga
+       yang terlihat di aplikasi sama dengan hasil cetak. */
+    renderReceiptPreview();
+
     /* Ukur tinggi struk saat modal dibuka, supaya tombol Cetak bisa
        langsung memanggil window.print() di dalam gesture pengguna. */
     receiptPrintHeightMm = 0;
@@ -1088,9 +1096,21 @@
     return printCss;
   }
 
+  function buildReceiptPrintHtml() {
+    const paper = el.receiptPaper;
+    const paperHtml = paper ? paper.outerHTML : '';
+    const cssHref = new URL('css/style.css', location.href).href;
+    return (
+      '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+      '<link rel="stylesheet" href="' + cssHref + '">' +
+      '<style>' + collectPrintCss() + '</style>' +
+      '</head><body><div class="modal is-open" id="receiptModal" aria-hidden="false">' +
+      '<div class="modal-card modal-receipt">' + paperHtml + '</div></div></body></html>'
+    );
+  }
+
   async function measureReceiptHeightMm() {
-    const modal = el.receiptModal;
-    if (!modal) return 150;
+    if (!el.receiptPaper) return 150;
 
     const iframe = document.createElement('iframe');
     iframe.setAttribute('aria-hidden', 'true');
@@ -1099,12 +1119,7 @@
     document.body.appendChild(iframe);
 
     try {
-      const cssHref = new URL('css/style.css', location.href).href;
-      const html =
-        '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-        '<link rel="stylesheet" href="' + cssHref + '">' +
-        '<style>' + collectPrintCss() + '</style>' +
-        '</head><body>' + modal.outerHTML + '</body></html>';
+      const html = buildReceiptPrintHtml();
 
       await new Promise(function (resolve) {
         let done = false;
@@ -1132,10 +1147,70 @@
       const paper = doc.getElementById('receiptPaper');
       const heightPx = paper ? paper.scrollHeight : 0;
       if (!heightPx) return 150;
-      return Math.ceil((heightPx / 96) * 25.4) + 3;
+      /* +5mm: cadangan untuk margin/tear-off bawah printer thermal. */
+      return Math.ceil((heightPx / 96) * 25.4) + 5;
     } finally {
       iframe.remove();
     }
+  }
+
+  /* Pratinjau struk: iframe 58mm yang memakai CSS cetak, lalu diskalakan
+     agar mudah dibaca di layar. Tampilan ini identik dengan hasil cetak. */
+  let receiptPreviewHeightPx = 0;
+
+  function syncReceiptPreviewFade() {
+    const wrap = el.receiptPreviewWrap;
+    if (!wrap) return;
+    const shell = wrap.closest('.receipt-preview-shell');
+    if (!shell) return;
+    const atEnd = wrap.scrollTop + wrap.clientHeight >= wrap.scrollHeight - 4;
+    shell.classList.toggle('is-at-end', atEnd);
+  }
+
+  function fitReceiptPreview() {
+    const frame = el.receiptPreviewFrame;
+    const wrap = el.receiptPreviewWrap;
+    const spacer = el.receiptPreviewSpacer;
+    if (!frame || !wrap || !spacer || !receiptPreviewHeightPx) return;
+
+    const widthPx = (RECEIPT_PAGE_WIDTH_MM / 25.4) * 96;
+    const available = Math.max(140, wrap.clientWidth - 2);
+    const scale = Math.max(1.1, Math.min(1.9, available / widthPx));
+    frame.style.width = widthPx + 'px';
+    frame.style.height = receiptPreviewHeightPx + 'px';
+    frame.style.transform = 'scale(' + scale + ')';
+    spacer.style.height = Math.ceil(receiptPreviewHeightPx * scale) + 'px';
+    syncReceiptPreviewFade();
+  }
+
+  function renderReceiptPreview() {
+    const frame = el.receiptPreviewFrame;
+    if (!frame) return;
+    receiptPreviewHeightPx = 0;
+    if (el.receiptPreviewWrap) {
+      el.receiptPreviewWrap.scrollTop = 0;
+      const shell = el.receiptPreviewWrap.closest('.receipt-preview-shell');
+      if (shell) shell.classList.remove('is-at-end');
+    }
+    frame.onload = function () {
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const paper = doc.getElementById('receiptPaper');
+      if (!paper) return;
+      receiptPreviewHeightPx = Math.ceil(paper.scrollHeight);
+      fitReceiptPreview();
+    };
+    frame.srcdoc = buildReceiptPrintHtml();
+  }
+
+  window.addEventListener('resize', function () {
+    if (el.receiptModal && el.receiptModal.classList.contains('is-open')) {
+      fitReceiptPreview();
+    }
+  });
+
+  if (el.receiptPreviewWrap) {
+    el.receiptPreviewWrap.addEventListener('scroll', syncReceiptPreviewFade);
   }
 
   function printReceipt() {
@@ -1381,6 +1456,14 @@
   el.printReceipt.addEventListener('click', () => {
     printReceipt();
   });
+
+  if (el.saveReceiptPdf) {
+    el.saveReceiptPdf.addEventListener('click', () => {
+      /* Buka dialog cetak; pengguna memilih "Save as PDF".
+         Halaman PDF sudah otomatis 58mm x tinggi struk. */
+      printReceipt();
+    });
+  }
 
   if (el.ordersList) el.ordersList.addEventListener('click', (event) => {
     const btn = event.target.closest('[data-action]');
